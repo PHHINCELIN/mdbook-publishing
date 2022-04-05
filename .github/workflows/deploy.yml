@@ -20,15 +20,11 @@ jobs:
       run: |
         # This assumes your book is in the root of your repository.
         # Just add a `cd` here if you need to change to another directory.
+        git worktree add /tmp/book gh-pages
         mdbook build
-        git worktree add gh-pages gh-pages
-        git config user.name "Deploy from CI"
-        git config user.email ""
-        cd gh-pages
-        # Delete the ref to avoid keeping history.
-        git update-ref -d refs/heads/gh-pages
-        rm -rf *
-        mv ../book/* .
-        git add .
-        git commit -m "Deploy $GITHUB_SHA to gh-pages"
-        git push --force
+        rm -rf /tmp/book/* # this won't delete the .git directory
+        cp -rp book/* /tmp/book/
+        cd /tmp/book
+        git add -A
+        git commit -m 'deploy new book'
+        git push origin gh-pages
